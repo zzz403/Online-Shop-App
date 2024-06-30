@@ -298,5 +298,82 @@ function putItem(){
     var time = 1;
     setTimeout(function() {
       timedLoop(50, function() {
-        setPosition("inforToHomePic",115 + (time * 8),25 + (time 
+        setPosition("inforToHomePic",115 + (time * 8),25 + (time * 34),
+        110 - (time * 5),110 - (time * 5));
+        time ++ ;
+         if(time >= 12 ){
+           timeLoopDebug();
+           homeUpDownF();
+         }
+      });
+    }, 150);
+  }
+  
+  //information page cart number plus and dec
+  onEvent("informationdec","click",function(){
+    calSingle(-1);
+  });
+  
+  onEvent("informationAdd","click",function(){
+    calSingle(1);
+  });
+  
+  //calculate the price for a single item in the information page
+  function calSingle(a){
+    var num = getNumber("informationNum") + a;
+    setNumber("informationNum",num);
+    if(num <= 1){
+      hideElement("informationdec");
+    }else{
+      showElement("informationdec");
+    }
+    if(num >= item_stock[infordex]){
+      hideElement("informationAdd");
+    }else{
+      showElement("informationAdd");
+    }
+    num = num * item_price[infordex];
+    setText("informationPrice","$ " + num);
+  }
+  
+  //when click the buy btm in the inforpage take the item to the cart
+  onEvent("informationBuy","click",function(){
+    if(item_stock[infordex] >= 1){
+      addToCart(infordex,getNumber("informationNum"));
+      inforToHomeAnimation();
+      setScreen("HomePage");
+    }else{
+      showElement("informationSorry");
+      setTimeout(function() {
+        hideElement("informationSorry");
+      }, 3000);
+    }
+  });
+  
+  //contact with the poster
+  onEvent("informationContact","click",function(){
+    var string = "Hi, I have a little problem with 【" + item_name[infordex] + "】";
+    sendMessage(item_poster[infordex],string);
+  });
+  
+  //function for add things to the shooping cart
+  function addToCart (a,b){
+    var inCart = false;
+    for(var i = 0; i< cartIdemName.length; i++){
+      if(cartIdemName[i] == a){
+        inCart = true;
+        if(cartIdemNum[i] + b >= item_stock[infordex]){
+          cartIdemNum[i] = item_stock[infordex];
+        }else{
+          cartIdemNum[i] += b;
+        }
+        break;
+      }
+    }
+    if(inCart == false){
+      appendItem(cartIdemName,infordex);
+      appendItem(cartIdemNum,b);
+    }
+    changeCartNum();
+  }
   
